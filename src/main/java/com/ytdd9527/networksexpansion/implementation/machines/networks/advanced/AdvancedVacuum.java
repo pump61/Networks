@@ -239,6 +239,15 @@ public class AdvancedVacuum extends NetworkObject {
             return cache;
         }
 
+        // The block's data container can still be loading asynchronously at this point,
+        // in which case getData()/setData() would throw instead of returning null. Return
+        // the default without persisting it - the real value will be picked up once the
+        // data has finished loading.
+        var container = StorageCacheUtils.getDataContainer(location);
+        if (container == null || !container.isDataLoaded()) {
+            return FilterMode.BLACK_LIST;
+        }
+
         String mode = StorageCacheUtils.getData(location, BS_FILTER_MODE);
         if (mode == null) {
             setFilterMode(blockMenu, FilterMode.BLACK_LIST);
@@ -258,6 +267,15 @@ public class AdvancedVacuum extends NetworkObject {
         MatchMode cache = CACHE_MATCH_MODE.get(location);
         if (cache != null) {
             return cache;
+        }
+
+        // The block's data container can still be loading asynchronously at this point,
+        // in which case getData()/setData() would throw instead of returning null. Return
+        // the default without persisting it - the real value will be picked up once the
+        // data has finished loading.
+        var container = StorageCacheUtils.getDataContainer(location);
+        if (container == null || !container.isDataLoaded()) {
+            return MatchMode.ALL_MATCH;
         }
 
         String mode = StorageCacheUtils.getData(location, BS_MATCH_MODE);

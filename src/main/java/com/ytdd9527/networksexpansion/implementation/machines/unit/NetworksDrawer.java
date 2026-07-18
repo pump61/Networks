@@ -126,7 +126,9 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                 String lock = null;
                 String voidExcess = null;
                 String quickModeStr = null;
-                if (blockData != null) {
+                // The block's data container can still be loading asynchronously at this point,
+                // in which case getData() would throw instead of returning null.
+                if (blockData != null && blockData.isDataLoaded()) {
                     lock = blockData.getData("locked");
                     voidExcess = blockData.getData("voidExcess");
                     quickModeStr = blockData.getData("quickTransferMode");

@@ -604,7 +604,10 @@ public class NetworkQuantumStorage extends SpecialSlimefunItem implements Distin
     private @NotNull QuantumCache addCache(@NotNull BlockMenu blockMenu) {
         final Location location = blockMenu.getLocation();
         SlimefunBlockData blockData = StorageCacheUtils.getBlock(location);
-        if (blockData == null) {
+        // The block's data container can be null (not yet cached) or still loading
+        // asynchronously at this point, in which case getData() would throw instead
+        // of returning null.
+        if (blockData == null || !blockData.isDataLoaded()) {
             return new QuantumCache(null, 0, this.maxAmount, false, this.supportsCustomMaxAmount);
         }
         final String amountString = blockData.getData(BS_AMOUNT);

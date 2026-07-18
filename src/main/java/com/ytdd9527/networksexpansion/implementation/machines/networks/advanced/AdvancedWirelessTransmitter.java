@@ -123,7 +123,12 @@ public class AdvancedWirelessTransmitter extends AdvancedDirectional implements 
             public void newInstance(@NotNull BlockMenu blockMenu, @NotNull Block b) {
                 final Location location = blockMenu.getLocation();
 
-                final String rawLimit = StorageCacheUtils.getData(location, LIMIT_KEY);
+                // The block's data container can still be loading asynchronously at this point,
+                // in which case StorageCacheUtils.getData() would throw instead of returning null.
+                final var container = StorageCacheUtils.getDataContainer(location);
+                final String rawLimit = container != null && container.isDataLoaded()
+                    ? StorageCacheUtils.getData(location, LIMIT_KEY)
+                    : null;
 
                 int limit = rawLimit == null ? getMaxLimit() : Integer.parseInt(rawLimit);
 
