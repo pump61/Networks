@@ -327,7 +327,12 @@ public abstract class NetworkDirectional extends NetworkObject {
             @Override
             public void newInstance(@NotNull BlockMenu blockMenu, @NotNull Block b) {
                 final BlockFace direction;
-                final String string = StorageCacheUtils.getData(blockMenu.getLocation(), DIRECTION);
+                // The block's data container can still be loading asynchronously at this point,
+                // in which case StorageCacheUtils.getData() would throw instead of returning null.
+                final var container = StorageCacheUtils.getDataContainer(blockMenu.getLocation());
+                final String string = container != null && container.isDataLoaded()
+                    ? StorageCacheUtils.getData(blockMenu.getLocation(), DIRECTION)
+                    : null;
 
                 if (string == null) {
                     // This likely means a block was placed before I made it directional
